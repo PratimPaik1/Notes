@@ -105,12 +105,12 @@ function App() {
       <hr className="mb-6" />
 
       {/* ---------------- Form ---------------- */}
-      <form className="flex gap-5 justify-center" onSubmit={handelForm}>
+      <form className="flex gap-5 justify-center flex-col items-center md:flex-row" onSubmit={handelForm}>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title"
-          className="border px-2 rounded-2xl"
+          className="border px-2 rounded-2xl w-[70%] md:w-[30%]"
           required
         />
 
@@ -118,12 +118,12 @@ function App() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter description"
-          className="border px-2 rounded-2xl"
+          className="border px-2 rounded-2xl w-[70%] md:w-[30%]"
           required
         />
 
         <button
-          className="bg-green-500 px-2 py-1 rounded-xl active:scale-95"
+          className="bg-green-500 px-2 py-1 rounded-xl active:scale-95 w-[50%] md:w-[30%]"
           type="submit"
         >
           {editId ? "Update" : "Create"}
@@ -137,13 +137,13 @@ function App() {
               setDescription("");
               setEditId(null);
             }}
-            className="bg-gray-500 px-2 py-1 rounded-xl active:scale-95"
+            className="bg-gray-500 px-2 py-1 rounded-xl active:scale-95 w-[50%] md:w-[30%]"
           >
             Cancel
           </button>
         )}
       </form>
-
+        <hr className="mt-6"/>
       {/* ---------------- Notes ---------------- */}
       <div className="flex flex-wrap gap-6 p-5 w-full justify-center">
         {isLoading &&
