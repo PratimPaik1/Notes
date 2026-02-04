@@ -38,7 +38,7 @@ function App() {
     const fetchNotes = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get("http://localhost:3000/api/notes");
+        const res = await axios.get("https://notes-4x8s.onrender.com/api/notes");
         setNotes(res.data.notes || []);
       } catch (error) {
         console.error("Error fetching notes:", error);
@@ -53,7 +53,7 @@ function App() {
   /* ---------- Delete ---------- */
   async function deleteNotes(id) {
     try {
-      await axios.delete(`http://localhost:3000/api/notes/${id}`);
+      await axios.delete(`https://notes-4x8s.onrender.com/api/notes/${id}`);
       setRender((prev) => prev + 1);
     } catch (error) {
       console.error("Delete failed", error);
@@ -68,12 +68,12 @@ function App() {
       if (editId) {
         // PATCH (edit)
         await axios.patch(
-          `http://localhost:3000/api/notes/${editId}`,
+          `https://notes-4x8s.onrender.com/api/notes/${editId}`,
           { title, description }
         );
       } else {
         // POST (create)
-        await axios.post("http://localhost:3000/api/notes", {
+        await axios.post("https://notes-4x8s.onrender.com/api/notes", {
           title,
           description,
         });
