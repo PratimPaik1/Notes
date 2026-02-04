@@ -45,6 +45,9 @@ function App() {
       } finally {
         setIsLoading(false);
       }
+
+      setTitle("")
+      setDescription("")
     };
 
     fetchNotes();
