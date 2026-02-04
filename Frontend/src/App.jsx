@@ -58,6 +58,7 @@ function App() {
     try {
       await axios.delete(`https://notes-4x8s.onrender.com/api/notes/${id}`);
       setRender((prev) => prev + 1);
+      setEditId(null)
     } catch (error) {
       console.error("Delete failed", error);
     }
