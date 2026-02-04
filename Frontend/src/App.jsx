@@ -5,7 +5,6 @@ import axios from "axios";
 function SkeletonCard() {
   return (
     <div className="bg-[#4f4f4f] rounded-md p-4 w-80 overflow-hidden relative">
-      {/* Shimmer layer */}
       <div className="absolute inset-0 -translate-x-full shimmer"></div>
 
       <div className="h-6 bg-gray-600 rounded w-3/4 mb-3"></div>
@@ -21,13 +20,20 @@ function SkeletonCard() {
   );
 }
 
-
 /* ---------------- App ---------------- */
 function App() {
   const [notes, setNotes] = useState([]);
   const [render, setRender] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // form states
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  // edit state
+  const [editId, setEditId] = useState(null);
+
+  /* ---------- Fetch Notes ---------- */
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -44,6 +50,7 @@ function App() {
     fetchNotes();
   }, [render]);
 
+  /* ---------- Delete ---------- */
   async function deleteNotes(id) {
     try {
       await axios.delete(`http://localhost:3000/api/notes/${id}`);
@@ -53,6 +60,43 @@ function App() {
     }
   }
 
+  /* ---------- Create / Update ---------- */
+  async function handelForm(e) {
+    e.preventDefault();
+
+    try {
+      if (editId) {
+        // PATCH (edit)
+        await axios.patch(
+          `http://localhost:3000/api/notes/${editId}`,
+          { title, description }
+        );
+      } else {
+        // POST (create)
+        await axios.post("http://localhost:3000/api/notes", {
+          title,
+          description,
+        });
+      }
+
+      setRender((prev) => prev + 1);
+
+      // reset form
+      setTitle("");
+      setDescription("");
+      setEditId(null);
+    } catch (error) {
+      console.error("Submit failed", error);
+    }
+  }
+
+  /* ---------- Edit ---------- */
+  function handleEdit(note) {
+    setTitle(note.title);
+    setDescription(note.description);
+    setEditId(note._id);
+  }
+
   return (
     <>
       <h1 className="text-center text-5xl font-bold py-5 text-white">
@@ -60,23 +104,58 @@ function App() {
       </h1>
       <hr className="mb-6" />
 
-      <div className="flex flex-wrap gap-6 p-5 w-full  justify-center">
-        {/* ---------------- Skeleton Loading ---------------- */}
+      {/* ---------------- Form ---------------- */}
+      <form className="flex gap-5 justify-center" onSubmit={handelForm}>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title"
+          className="border px-2 rounded-2xl"
+          required
+        />
+
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Enter description"
+          className="border px-2 rounded-2xl"
+          required
+        />
+
+        <button
+          className="bg-green-500 px-2 py-1 rounded-xl active:scale-95"
+          type="submit"
+        >
+          {editId ? "Update" : "Create"}
+        </button>
+
+        {editId && (
+          <button
+            type="button"
+            onClick={() => {
+              setTitle("");
+              setDescription("");
+              setEditId(null);
+            }}
+            className="bg-gray-500 px-2 py-1 rounded-xl active:scale-95"
+          >
+            Cancel
+          </button>
+        )}
+      </form>
+
+      {/* ---------------- Notes ---------------- */}
+      <div className="flex flex-wrap gap-6 p-5 w-full justify-center">
         {isLoading &&
-          Array.from({ length: 16 }).map((_, index) => (
-            <SkeletonCard key={index} />
+          Array.from({ length: 12 }).map((_, i) => (
+            <SkeletonCard key={i} />
           ))}
 
-        {/* ---------------- No Notes ---------------- */}
         {!isLoading && notes.length === 0 && (
-          <div className="w-full flex justify-center items-center text-4xl text-gray-300">
-            No notes found...
-          </div>
+          <div className="text-4xl text-gray-300">No notes found...</div>
         )}
 
-        {/* ---------------- Notes ---------------- */}
         {!isLoading &&
-          notes.length > 0 &&
           notes.map((item) => (
             <div
               key={item._id}
@@ -86,17 +165,27 @@ function App() {
                 <h2 className="text-xl font-semibold mb-2 text-white">
                   {item.title}
                 </h2>
+                <hr />
                 <p className="text-gray-200 break-words">
                   {item.description}
                 </p>
               </div>
 
-              <button
-                onClick={() => deleteNotes(item._id)}
-                className="mt-4 bg-red-500 hover:bg-red-600 text-white py-1 rounded active:scale-95"
-              >
-                Delete
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => deleteNotes(item._id)}
+                  className="bg-red-500 hover:bg-red-600 text-white py-1 rounded active:scale-95 flex-1"
+                >
+                  Delete
+                </button>
+
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="bg-green-500 hover:bg-green-600 text-white py-1 rounded active:scale-95 flex-1"
+                >
+                  Edit
+                </button>
+              </div>
             </div>
           ))}
       </div>
